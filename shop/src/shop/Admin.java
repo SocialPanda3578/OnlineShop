@@ -1,5 +1,6 @@
 package shop;
 
+import java.io.Console;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import shop.Panel.*;
@@ -23,7 +24,9 @@ public class Admin extends User{
                 System.out.print("请输入用户名：");
                 username = Main.sc.next();
                 System.out.print("请输入密码：");
-                password = Main.sc.next();
+                Console console = System.console();
+                char[] pass = console.readPassword();
+                password = String.valueOf(pass);
                 if (password == null || username == null) {
                     System.out.println("用户名或密码不能为空");
                     continue;
@@ -87,7 +90,9 @@ public class Admin extends User{
             Object[] obj = {newName, newPassword, targetUser};
             int i=db.update("update users set u_username=?,u_password=? where u_username=?", obj);
             if(i!=0) System.out.println("用户修改成功");
-            else System.out.println("用户修改失败");
+            else
+                System.out.println("用户修改失败");
+            db.closeConnection();
         }
         else{
             System.out.println("用户不存在，请检查输入！");
@@ -152,7 +157,8 @@ public class Admin extends User{
                 System.out.println("商品修改成功");
             else
                 System.out.println("商品修改失败");
-        }
+            db.closeConnection();
+            }
         else {
             System.out.println("商品不存在，请检查输入！");
         }
@@ -170,6 +176,7 @@ public class Admin extends User{
             System.out.println("商品上架成功");
         else
             System.out.println("商品上架失败");
+        db.closeConnection();
     }
     public void deleteItems() {
         System.out.println("输入 要删除商品的编号");

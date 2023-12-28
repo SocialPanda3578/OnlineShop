@@ -28,10 +28,11 @@ public class Shop {
         }
     }
 
-    public void ID_ASC_Order(){
+    public void ID_ASC_Order() {
+        System.out.println("商品编号\t名称\t\t价格\t\t数量");
         DBUtil db=new DBUtil();
         Object objs[]={};
-        ResultSet rs=db.select("select * from items order by it_id asc",objs);
+        ResultSet rs = db.select("select * from items order by it_id asc", objs);
         try {
             while (rs.next()) {
                 String id = rs.getString("it_id");
@@ -49,7 +50,8 @@ public class Shop {
         }
     }
 
-    public void Price_ASC_Order(){
+    public void Price_ASC_Order() {
+        System.out.println("商品编号\t名称\t\t价格\t\t数量");
         DBUtil db=new DBUtil();
         Object objs[]={};
         ResultSet rs=db.select("select * from items order by it_price asc",objs);
@@ -70,7 +72,7 @@ public class Shop {
         }
     }
 
-    public Items Find(String s) {
+    public void Find(String s) {
         DBUtil db = new DBUtil();
         Object obj[] = { s };
         ResultSet rs = db.select("select * from items where ca_id=? or ca_name=?", obj);
@@ -87,8 +89,8 @@ public class Shop {
         } finally {
             db.closeConnection();
         }
-        Items i = new Items(null, null, null, null);
-        return i;
+        // i = new Items(null, null, null, null);
+        //return i;
     }
 
     public void buy(User user) throws SQLException {
@@ -97,29 +99,30 @@ public class Shop {
             String name = Main.sc.next();
             System.out.println("想买多少");
             int n = Main.sc.nextInt();
-            
+
             Object obj[] = { name, name };
             DBUtil db = new DBUtil();
-            ResultSet rs=db.select("select * from items where it_name=? or it_id=?", obj);
+            ResultSet rs = db.select("select * from items where it_name=? or it_id=?", obj);
             if (rs.next()) {
                 if (rs.getInt("it_nums") < n) {
                     System.out.println("库存不够");
-                }
-                else {
+                } else {
                     String id = rs.getString("it_id");
                     String na = rs.getString("it_name");
                     Double price = rs.getDouble("it_price");
-                    Integer num = rs.getInt("it_nums");
-                    db.update("insert into " + user.getUsername() + "_history values(?,?,?,?)", new Object[]{id,na,price,n});
+                    db.update("insert into " + user.getUsername() + "_history values(?,?,?,?)",
+                            new Object[] { id, na, price, n });
                     db.update("update items set it_nums=it_nums-? where it_id=?", new Object[] { n, id });
                     db.update("delete from items where it_nums<=0", new Object[] {});
-                    System.out.println("商品" + na + "购买成功");
+                    System.out.println(n+"件 商品" + na + "购买成功");
                 }
-            }
-            else {
+            } else {
                 System.out.println("商品不存在");
             }
             db.closeConnection();
+        }
+        else {
+            System.out.println("请登录后使用");
         }        
     }
 }

@@ -4,31 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Cart {
-    public void cartPanel(User user) throws SQLException {
-        if (user.isLogin()) {
-            refreshCart(user);
-            printCart(user);
-            while (true) {
-                System.out.println("\t1.删除购物车内商品");
-                System.out.println("\t2.购物车结算");
-                System.out.println("\t3.返回上一页");
-                System.out.println("***************************");
-                System.out.print("请选择菜单:");
-                int x = Main.sc.nextInt();
-                if (x == 1)
-                    removeCart(user);
-                else if (x == 2)
-                    checkOut(user);
-                else if (x == 3)
-                    break;
-                else
-                    System.out.println("无效输入！");
-            }
-        } else {
-            System.out.println("请登录后使用");
-        }
-    }
-
     public void refreshCart(User user) throws SQLException {
         if (user.isLogin()) {
             DBUtil db = new DBUtil();
@@ -43,6 +18,10 @@ public class Cart {
                             new Object[] { price, id });
                 }
             }
+            db.closeConnection();
+        }
+        else {
+            System.out.println("请登录后使用");
         }
     }
 
@@ -92,8 +71,10 @@ public class Cart {
                 db.closeConnection();
             }
             Object obj2[] = {};
-            db.update("delete from " + user.getUsername() + "_cart where nums<0", obj2);
-        } else {
+            db.update("delete from " + user.getUsername() + "_cart where nums<1", obj2);
+            db.closeConnection();
+        } 
+        else {
             System.out.println("请登录后使用");
         }
     }
@@ -150,7 +131,7 @@ public class Cart {
                     Object obj2[] = { id, name, price, nums };
                     db.update("insert into " + user.getUsername() + "_history values(?,?,?,?)", obj2);//加入历史
                     db.update("update items set it_nums=it_nums-? where it_id=?", new Object[] { nums, id });//删除item
-                    System.out.println("商品"+name+"购买成功!");
+                    System.out.println(nums+"件商品"+name+"购买成功!");
                 }
             } catch (SQLException e1) {
                 e1.printStackTrace();
@@ -173,7 +154,8 @@ public class Cart {
             if (i != 0)
                 System.out.println("清空购物车成功!");
             else
-                System.out.println("清空购物车失败!");
+                System.out.println("购物车已为空!");
+            db.closeConnection();
         }
         else
             System.out.println("请登录后操作");
